@@ -47,8 +47,9 @@ export const Validator = {
       }
     });
 
+    const oldErrorMessage = _.get(component, 'component.validate.customMessage');
     const customErrorMessage = _.get(component, 'component.validate.custom');
-    if (result && customErrorMessage) {
+    if (result && (customErrorMessage || oldErrorMessage)) {
       result = component.t(result, {
         data: component.data
       });
