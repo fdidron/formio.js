@@ -11,12 +11,12 @@ Formio.forms = {};
 const getOptions = function(options) {
   options = _.defaults(options, {
     submitOnEnter: false,
-    i18next: i18next
+    i18next: i18next,
   });
   if (!options.events) {
     options.events = new EventEmitter({
       wildcard: false,
-      maxListeners: 0
+      maxListeners: 0,
     });
   }
   return options;
@@ -63,13 +63,11 @@ export default class FormioForm extends FormioComponents {
       // Support legacy way of doing translations.
       if (options.i18n.resources) {
         i18n = options.i18n;
-      }
-      else {
+      } else {
         _.each(options.i18n, (lang, code) => {
           if (!i18n.resources[code]) {
             i18n.resources[code] = {translation: lang};
-          }
-          else {
+          } else {
             _.assign(i18n.resources[code].translation, lang);
           }
         });
@@ -81,8 +79,7 @@ export default class FormioForm extends FormioComponents {
 
     if (options && options.i18n) {
       this.options.i18n = options.i18n;
-    }
-    else {
+    } else {
       this.options.i18n = i18n;
     }
 
@@ -191,7 +188,7 @@ export default class FormioForm extends FormioComponents {
      *
      * @type {Promise}
      */
-    this.onElement = new Promise((resolve) => {
+    this.onElement = new Promise(resolve => {
       /**
        * Called when the element has been resolved.
        *
@@ -218,7 +215,7 @@ export default class FormioForm extends FormioComponents {
   set language(lang) {
     return new Promise((resolve, reject) => {
       this.options.language = lang;
-      i18next.changeLanguage(lang, (err) => {
+      i18next.changeLanguage(lang, err => {
         if (err) {
           return reject(err);
         }
@@ -253,7 +250,7 @@ export default class FormioForm extends FormioComponents {
     }
     i18next.initialized = true;
     return new Promise((resolve, reject) => {
-      i18next.init(this.options.i18n, (err) => {
+      i18next.init(this.options.i18n, err => {
         this.options.language = i18next.language;
         if (err) {
           return reject(err);
@@ -274,7 +271,10 @@ export default class FormioForm extends FormioComponents {
     }
 
     if (this.element) {
-      this.element.removeEventListener('keydown', this.executeShortcuts.bind(this));
+      this.element.removeEventListener(
+        'keydown',
+        this.executeShortcuts.bind(this),
+      );
     }
 
     this.wrapper = element;
@@ -295,11 +295,7 @@ export default class FormioForm extends FormioComponents {
     }
 
     if (element.nodeName === 'INPUT') {
-      return [
-        'text',
-        'email',
-        'password'
-      ].indexOf(element.type) === -1;
+      return ['text', 'email', 'password'].indexOf(element.type) === -1;
     }
 
     return true;
@@ -317,15 +313,13 @@ export default class FormioForm extends FormioComponents {
 
     if (65 <= keyCode && keyCode <= 90) {
       char = String.fromCharCode(keyCode);
-    }
-    else if (keyCode === 13) {
+    } else if (keyCode === 13) {
       char = 'Enter';
-    }
-    else if (keyCode === 27) {
+    } else if (keyCode === 27) {
       char = 'Esc';
     }
 
-    _.each(this.shortcuts, (shortcut) => {
+    _.each(this.shortcuts, shortcut => {
       if (shortcut.ctrl && !ctrl) {
         return;
       }
@@ -352,14 +346,13 @@ export default class FormioForm extends FormioComponents {
 
       this.shortcuts.push({
         shortcut,
-        element
+        element,
       });
-    }
-    else {
+    } else {
       this.shortcuts.push({
         ctrl: true,
         shortcut,
-        element
+        element,
       });
     }
   }
@@ -371,7 +364,7 @@ export default class FormioForm extends FormioComponents {
 
     _.remove(this.shortcuts, {
       shortcut,
-      element
+      element,
     });
   }
 
@@ -389,14 +382,14 @@ export default class FormioForm extends FormioComponents {
    */
   loadSubmission() {
     if (this.formio.submissionId) {
-      this.onSubmission = this.formio.loadSubmission().then(
-        (submission) => this.setSubmission(submission),
-        (err) => this.submissionReadyReject(err)
-      ).catch(
-        (err) => this.submissionReadyReject(err)
-      );
-    }
-    else {
+      this.onSubmission = this.formio
+        .loadSubmission()
+        .then(
+          submission => this.setSubmission(submission),
+          err => this.submissionReadyReject(err),
+        )
+        .catch(err => this.submissionReadyReject(err));
+    } else {
       this.submissionReadyResolve();
     }
   }
@@ -410,15 +403,17 @@ export default class FormioForm extends FormioComponents {
   setSrc(value, options) {
     if (this.setUrl(value, options)) {
       this.nosubmit = false;
-      this.formio.loadForm({params: {live: 1}}).then(
-        (form) => {
+      this.formio
+        .loadForm({params: {live: 1}})
+        .then(form => {
           const setForm = this.setForm(form);
           this.loadSubmission();
           return setForm;
-        }).catch((err) => {
-        console.warn(err);
-        this.formReadyReject(err);
-      });
+        })
+        .catch(err => {
+          console.warn(err);
+          this.formReadyReject(err);
+        });
     }
   }
 
@@ -454,11 +449,7 @@ export default class FormioForm extends FormioComponents {
    * @param options
    */
   setUrl(value, options) {
-    if (
-      !value ||
-      (typeof value !== 'string') ||
-      (value === this._src)
-    ) {
+    if (!value || typeof value !== 'string' || value === this._src) {
       return false;
     }
     this._src = value;
@@ -509,10 +500,10 @@ export default class FormioForm extends FormioComponents {
       this._loading = loading;
       if (!this.loader && loading) {
         this.loader = this.ce('div', {
-          class: 'loader-wrapper'
+          class: 'loader-wrapper',
         });
         const spinner = this.ce('div', {
-          class: 'loader text-center'
+          class: 'loader text-center',
         });
         this.loader.appendChild(spinner);
       }
@@ -520,12 +511,10 @@ export default class FormioForm extends FormioComponents {
         try {
           if (loading) {
             this.prependTo(this.loader, this.wrapper);
-          }
-          else {
+          } else {
             this.removeChildFrom(this.loader, this.wrapper);
           }
-        }
-        catch (err) {
+        } catch (err) {
           // ingore
         }
       }
@@ -567,16 +556,15 @@ export default class FormioForm extends FormioComponents {
    */
   setForm(form) {
     if (form.display === 'wizard') {
-      console.warn('You need to instantiate the FormioWizard class to use this form as a wizard.');
+      console.warn(
+        'You need to instantiate the FormioWizard class to use this form as a wizard.',
+      );
     }
 
     if (this.onFormBuild) {
-      return this.onFormBuild.then(
-        () => this.createForm(form),
-        (err) => this.formReadyReject(err)
-      ).catch(
-        (err) => this.formReadyReject(err)
-      );
+      return this.onFormBuild
+        .then(() => this.createForm(form), err => this.formReadyReject(err))
+        .catch(err => this.formReadyReject(err));
     }
 
     // Set the form object.
@@ -639,20 +627,20 @@ export default class FormioForm extends FormioComponents {
    * @return {Promise.<TResult>}
    */
   setSubmission(submission) {
-    return this.onSubmission = this.formReady.then(
-      () => {
-        // If nothing changed, still trigger an update.
-        if (!this.setValue(submission)) {
-          this.triggerChange({
-            noValidate: true
-          });
-        }
-        this.submissionReadyResolve();
-      },
-      (err) => this.submissionReadyReject(err)
-    ).catch(
-      (err) => this.submissionReadyReject(err)
-    );
+    return (this.onSubmission = this.formReady
+      .then(
+        () => {
+          // If nothing changed, still trigger an update.
+          if (!this.setValue(submission)) {
+            this.triggerChange({
+              noValidate: true,
+            });
+          }
+          this.submissionReadyResolve();
+        },
+        err => this.submissionReadyReject(err),
+      )
+      .catch(err => this.submissionReadyReject(err)));
   }
 
   get schema() {
@@ -661,7 +649,11 @@ export default class FormioForm extends FormioComponents {
 
   mergeData(_this, _that) {
     _.mergeWith(_this, _that, (thisValue, thatValue) => {
-      if (Array.isArray(thisValue) && Array.isArray(thatValue) && thisValue.length !== thatValue.length) {
+      if (
+        Array.isArray(thisValue) &&
+        Array.isArray(thatValue) &&
+        thisValue.length !== thatValue.length
+      ) {
         return thatValue;
       }
     });
@@ -703,18 +695,19 @@ export default class FormioForm extends FormioComponents {
      */
     if (this.component) {
       this.component.components = form.components;
-    }
-    else {
+    } else {
       this.component = form;
     }
-    return this.onFormBuild = this.render().then(() => {
-      this.formReadyResolve();
-      this.onFormBuild = null;
-      this.setValue(this.submission);
-    }).catch((err) => {
-      console.warn(err);
-      this.formReadyReject(err);
-    });
+    return (this.onFormBuild = this.render()
+      .then(() => {
+        this.formReadyResolve();
+        this.onFormBuild = null;
+        this.setValue(this.submission);
+      })
+      .catch(err => {
+        console.warn(err);
+        this.formReadyReject(err);
+      }));
   }
 
   /**
@@ -754,15 +747,14 @@ export default class FormioForm extends FormioComponents {
       try {
         this.removeChild(this.alert);
         this.alert = null;
-      }
-      catch (err) {
+      } catch (err) {
         // ingore
       }
     }
     if (message) {
       this.alert = this.ce('div', {
         class: `alert alert-${type}`,
-        role: 'alert'
+        role: 'alert',
       });
       this.alert.innerHTML = message;
     }
@@ -778,7 +770,7 @@ export default class FormioForm extends FormioComponents {
   build() {
     this.on('submitButton', () => this.submit(), true);
     this.addComponents();
-    this.on('requestUrl', (args) => (this.submitUrl(args.url,args.headers)), true);
+    this.on('requestUrl', args => this.submitUrl(args.url, args.headers), true);
   }
 
   /**
@@ -793,8 +785,7 @@ export default class FormioForm extends FormioComponents {
     if (error) {
       if (Array.isArray(error)) {
         errors = errors.concat(error);
-      }
-      else {
+      } else {
         errors.push(error);
       }
     }
@@ -803,7 +794,7 @@ export default class FormioForm extends FormioComponents {
       return;
     }
     let message = `<p>${this.t('error')}</p><ul>`;
-    _.each(errors, (err) => {
+    _.each(errors, err => {
       if (err) {
         const errorMessage = err.message || err;
         message += `<li><strong>${errorMessage}</strong></li>`;
@@ -827,7 +818,7 @@ export default class FormioForm extends FormioComponents {
     this.setPristine(true);
     this.setValue(submission, {
       noValidate: true,
-      noCheck: true
+      noCheck: true,
     });
     this.setAlert('success', `<p>${this.t('complete')}</p>`);
     this.emit('submit', submission);
@@ -906,8 +897,7 @@ export default class FormioForm extends FormioComponents {
     if (noconfirm || confirm('Are you sure you want to cancel?')) {
       this.reset();
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
@@ -920,7 +910,7 @@ export default class FormioForm extends FormioComponents {
       }
 
       const submission = this.submission || {};
-      this.hook('beforeSubmit', submission, (err) => {
+      this.hook('beforeSubmit', submission, err => {
         if (err) {
           this.showErrors(err);
           return reject(err.message || err);
@@ -935,18 +925,14 @@ export default class FormioForm extends FormioComponents {
           if (this.nosubmit || !this.formio) {
             return resolve(this.onSubmit(submission, false));
           }
-          return this.formio.saveSubmission(submission)
-            .then(
-              (result) => resolve(this.onSubmit(result, true))
-            )
-            .catch(
-              (err) => {
-                this.onSubmissionError(err);
-                reject(err);
-              }
-            );
-        }
-        else {
+          return this.formio
+            .saveSubmission(submission)
+            .then(result => resolve(this.onSubmit(result, true)))
+            .catch(err => {
+              this.onSubmissionError(err);
+              reject(err);
+            });
+        } else {
           this.showErrors();
           return reject('Invalid Submission');
         }
@@ -976,26 +962,25 @@ export default class FormioForm extends FormioComponents {
   submit(before) {
     if (!before) {
       return this.beforeSubmit().then(() => this.executeSubmit());
-    }
-    else {
+    } else {
       return this.executeSubmit();
     }
   }
 
-  submitUrl(URL,headers) {
+  submitUrl(URL, headers) {
     if (!URL) {
       return console.warn('Missing URL argument');
     }
 
     const submission = this.submission || {};
-    const API_URL  = URL;
+    const API_URL = URL;
     const settings = {
       method: 'POST',
-      headers: {}
+      headers: {},
     };
 
     if (headers && headers.length > 0) {
-      headers.map((e) => {
+      headers.map(e => {
         if (e.header !== '' && e.value !== '') {
           settings.headers[e.header] = e.value;
         }
@@ -1003,18 +988,21 @@ export default class FormioForm extends FormioComponents {
     }
     if (API_URL && settings) {
       try {
-        Formio.makeStaticRequest(API_URL,settings.method,submission,settings.headers).then(() => {
+        Formio.makeStaticRequest(
+          API_URL,
+          settings.method,
+          submission,
+          settings.headers,
+        ).then(() => {
           this.emit('requestDone');
           this.setAlert('success', '<p> Success </p>');
         });
-      }
-      catch (e) {
+      } catch (e) {
         this.showErrors(`${e.statusText} ${e.status}`);
-        this.emit('error',`${e.statusText} ${e.status}`);
+        this.emit('error', `${e.statusText} ${e.status}`);
         console.error(`${e.statusText} ${e.status}`);
       }
-    }
-    else {
+    } else {
       this.emit('error', 'You should add a URL to this button.');
       this.setAlert('warning', 'You should add a URL to this button.');
       return console.warn('You should add a URL to this button.');
@@ -1023,13 +1011,15 @@ export default class FormioForm extends FormioComponents {
 }
 
 // Used to trigger a resize.
-Formio.onResize = (scale) => _.each(Formio.forms, (instance) => instance.onResize(scale));
+Formio.onResize = scale =>
+  _.each(Formio.forms, instance => instance.onResize(scale));
 Formio.triggerResize = _.debounce(Formio.onResize, 200);
-if ('addEventListener' in window) {
-  window.addEventListener('resize', () => Formio.triggerResize(), false);
-}
-else if ('attachEvent' in window) {
-  window.attachEvent('onresize', () => Formio.triggerResize());
+if(typeof window !== 'undefined'){
+  if ('addEventListener' in window) {
+    window.addEventListener('resize', () => Formio.triggerResize(), false);
+  } else if ('attachEvent' in window) {
+    window.attachEvent('onresize', () => Formio.triggerResize());
+  }
 }
 
 FormioForm.setBaseUrl = Formio.setBaseUrl;
